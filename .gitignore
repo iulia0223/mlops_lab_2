@@ -2,7 +2,8 @@ __pycache__/
 *.py[cod] 
 venv/ 
 .env 
-data/ 
+data/raw/*.csv
+data/prepared/*.csv
 models/ 
 .ipynb_checkpoints 
 mlruns/ 
