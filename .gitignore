@@ -2,9 +2,15 @@ __pycache__/
 *.py[cod] 
 venv/ 
 .env 
-data/raw/*.csv
-data/prepared/*.csv
+data/raw/weatherAUS.csv
+data/prepared/
 models/ 
 .ipynb_checkpoints 
 mlruns/ 
 .trash/
+mlartifacts/
+mlflow.db
+models/
+.hydra/
+*.pkl
+*.log

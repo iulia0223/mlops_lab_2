@@ -1,0 +1,52 @@
+name: Model-CI
+on: [push, pull_request] # Запускати при кожному пуші або PR
+
+permissions:
+  contents: read
+  pull-requests: write # Потрібно для того, щоб CML міг писати коментарі
+
+jobs:
+  train-and-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install dvc[s3] pytest # Додаємо інструменти для тестів
+
+      - name: Train model
+        run: |
+          python src/train.py # Запускаємо тренування
+
+      - name: Run Quality Gate Tests
+        env:
+          F1_THRESHOLD: "0.75" # Встановлюємо наш поріг
+        run: |
+          pytest tests/test_model.py # Запускаємо pytest
+
+      - name: Create CML Report
+        if: github.event_name == 'pull_request' # Тільки для Pull Requests
+        uses: iterative/setup-cml@v2
+        
+      - name: Publish Results
+        if: github.event_name == 'pull_request'
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## ML Experiment Results" > report.md
+          echo "### Metrics" >> report.md
+          cat metrics.json >> report.md
+          
+          echo "### Visualizations" >> report.md
+          cml publish confusion_matrix.png --md >> report.md # Публікація графіку
+          
+          cml comment create report.md # Відправка звіту в коментарі PR
