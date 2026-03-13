@@ -1,0 +1,19 @@
+seed: 42
+mlflow:
+  tracking_uri: "http://127.0.0.1:5000"
+  experiment_name: "Rain_Australia_HPO"
+data:
+  processed_path: "data/prepared/train.csv" # перевірте, чи файл за цим шляхом
+model:
+  type: "random_forest"
+hpo:
+  n_trials: 20
+  sampler: "tpe"
+  metric: "f1"
+  direction: "maximize"
+  random_forest:
+    n_estimators: { low: 50, high: 200 }
+    max_depth: { low: 2, high: 15 }
+hydra:
+  run:
+    dir: .
