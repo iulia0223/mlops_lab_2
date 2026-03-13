@@ -27,6 +27,7 @@ jobs:
       - name: Train model
         run: |
           python src/train.py
+          ls -R # Виведе список усіх файлів, щоб ми бачили, чи з'явилися артефакти
 
       - name: Run Quality Gate Tests
         env:
