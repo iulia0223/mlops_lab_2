@@ -1,60 +1,59 @@
 import pandas as pd
-import mlflow
-import mlflow.sklearn
-from sklearn.model_selection import train_test_split
+import numpy as np
+import json
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import f1_score, accuracy_score, confusion_matrix
 from sklearn.impute import SimpleImputer
 import joblib
 import os
+import sys
 
-# 1. Ініціалізація експерименту (Крок 4.9.4)
-mlflow.set_experiment("Rain_Australia_Experiment")
-
-# 2. Завантаження та підготовка даних (Крок 4.9.1-2)
-# Видаляємо рядки, де немає цільової змінної
-df = pd.read_csv('data/raw/weatherAUS.csv').dropna(subset=['RainTomorrow'])
-
-# Вибираємо числові ознаки для базової моделі (Baseline)
-cols = ['MinTemp', 'MaxTemp', 'Rainfall', 'Humidity3pm', 'Pressure3pm']
-X = df[cols]
-y = df['RainTomorrow'].map({'No': 0, 'Yes': 1})
-
-# Заповнюємо пропуски середнім значенням (Imputation)
-imputer = SimpleImputer(strategy='mean')
-X_imputed = imputer.fit_transform(X)
-
-# 3. Розділення на тренувальну та тестову вибірки (Крок 4.9.3)
-X_train, X_test, y_train, y_test = train_test_split(X_imputed, y, test_size=0.2, random_state=42)
-
-# 4. Виконання 5 експериментів (Крок 4.2.7)
-# Ми будемо змінювати глибину дерева (max_depth)
-for depth in [2, 5, 10, 15, 20]:
-    with mlflow.start_run(run_name=f"Run_Depth_{depth}"):
-        # Ініціалізація та навчання моделі
-        model = RandomForestClassifier(max_depth=depth, n_estimators=50, random_state=42)
-        model.fit(X_train, y_train)
+def train_final_model():
+    try:
+        print("--- СТАРТ ТРЕНУВАННЯ ---")
         
-        # Отримання прогнозів
-        predictions = model.predict(X_test)
-        
-        # Розрахунок метрик (Крок 4.9.5)
-        acc = accuracy_score(y_test, predictions)
-        f1 = f1_score(y_test, predictions)
-        
-        # 5. Логування результатів у MLflow (Крок 4.9.5)
-        mlflow.log_param("max_depth", depth)
-        mlflow.log_metric("accuracy", acc)
-        mlflow.log_metric("f1_score", f1)
-        
-        # Логування самої моделі як артефакту
-        mlflow.sklearn.log_model(model, "random_forest_model")
-        
-        print(f"Завершено запуск: max_depth={depth}, accuracy={acc:.4f}")
+        # 1. Дані
+        data_path = "data/prepared/train.csv"
+        if not os.path.exists(data_path):
+            print(f"ПОМИЛКА: {data_path} не знайдено!")
+            sys.exit(1)
 
-        # Створи папку для моделей, якщо її немає
-os.makedirs('models', exist_ok=True)
+        train = pd.read_csv(data_path)
+        X = train.select_dtypes(include=[np.number])
+        if "RainTomorrow" in train.columns:
+            y = train["RainTomorrow"].map({'No': 0, 'Yes': 1})
+            if "RainTomorrow" in X.columns:
+                X = X.drop("RainTomorrow", axis=1)
+        
+        imputer = SimpleImputer(strategy='mean')
+        X = pd.DataFrame(imputer.fit_transform(X), columns=X.columns)
 
-# Після циклу навчання збережи останню (або найкращу) модель локально
-joblib.dump(model, 'models/model.pkl')
-print("Модель успішно збережена в models/model.pkl")
+        # 2. Модель
+        model = RandomForestClassifier(n_estimators=138, max_depth=15, random_state=42)
+        model.fit(X, y)
+
+        # 3. Збереження (в КОРІНЬ для тестів)
+        preds = model.predict(X)
+        metrics = {"f1": float(f1_score(y, preds)), "accuracy": float(accuracy_score(y, preds))}
+        
+        with open("metrics.json", "w") as f:
+            json.dump(metrics, f, indent=4)
+        
+        cm = confusion_matrix(y, preds)
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+        plt.savefig("confusion_matrix.png")
+
+        os.makedirs("models", exist_ok=True)
+        joblib.dump(model, "models/model.pkl")
+        
+        print("--- ВСІ АРТЕФАКТИ СТВОРЕНО УСПІШНО ---")
+        
+    except Exception as e:
+        print(f"КРИТИЧНА ПОМИЛКА: {str(e)}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    train_final_model()
