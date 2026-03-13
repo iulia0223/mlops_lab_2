@@ -1,9 +1,9 @@
 name: Model-CI
-on: [push, pull_request] # Запускати при кожному пуші або PR
+on: [push, pull_request]
 
 permissions:
   contents: read
-  pull-requests: write # Потрібно для того, щоб CML міг писати коментарі
+  pull-requests: write
 
 jobs:
   train-and-report:
@@ -15,41 +15,26 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Змінено на 3.10 для кращої сумісності
-          cache: 'pip'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
-          # 1. Оновлюємо pip до останньої версії (критично для SSL)
           python -m pip install --upgrade pip
-          
-          # 2. Оновлюємо інструменти збірки
-          pip install --upgrade setuptools wheel
-          
-          # 3. Примусово ставимо бінарні версії основних пакетів та pytest
-          pip install --only-binary=:all: numpy pandas scikit-learn pytest
-          
-          # 4. Встановлюємо решту з файлу
+          # Встановлюємо лише необхідне для навчання та тестів
+          pip install --only-binary=:all: numpy pandas scikit-learn pytest matplotlib seaborn joblib
           pip install -r requirements.txt
-          
-          # 5. Ставимо CML
-          pip install cml
 
       - name: Train model
         run: |
-          python src/train.py # Запускаємо тренування, яке створює metrics.json та confusion_matrix.png
+          python src/train.py
 
       - name: Run Quality Gate Tests
         env:
-          F1_THRESHOLD: "0.70" # Можна трохи знизити поріг, якщо 0.75 не проходило
+          F1_THRESHOLD: "0.70"
         run: |
-          pytest tests/test_model.py # Запускаємо ваші тести якості
+          pytest tests/test_model.py
 
-      - name: Setup CML
-        if: github.event_name == 'pull_request'
-        uses: iterative/setup-cml@v2
-        
-      - name: Publish CML Report
+      - name: Create Report
         if: github.event_name == 'pull_request'
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,8 +44,10 @@ jobs:
           echo "\`\`\`json" >> report.md
           cat metrics.json >> report.md
           echo "\`\`\`" >> report.md
-          
           echo "### Visualizations" >> report.md
-          cml publish confusion_matrix.png --md >> report.md # Завантаження графіку
+          echo "![Confusion Matrix](./confusion_matrix.png)" >> report.md
           
-          cml comment create report.md # Публікація коментаря в Pull Request
+          # Використовуємо звичайний коментар через GitHub API замість CML бібліотеки
+          curl -X POST -H "Authorization: token $REPO_TOKEN" \
+            -d "{\"body\": \"$(cat report.md | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
