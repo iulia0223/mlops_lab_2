@@ -20,13 +20,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel
-          # Встановлюємо основні бібліотеки у бінарному форматі
-          pip install --only-binary=:all: numpy pandas scikit-learn
-          # Решта бібліотек з файлу
+          # 1. Оновлюємо pip до останньої версії (критично для SSL)
+          python -m pip install --upgrade pip
+          
+          # 2. Оновлюємо інструменти збірки
+          pip install --upgrade setuptools wheel
+          
+          # 3. Примусово ставимо бінарні версії основних пакетів та pytest
+          pip install --only-binary=:all: numpy pandas scikit-learn pytest
+          
+          # 4. Встановлюємо решту з файлу
           pip install -r requirements.txt
-          # Встановлюємо інструменти для звіту та тестів
-          pip install pytest cml
+          
+          # 5. Ставимо CML
+          pip install cml
 
       - name: Train model
         run: |
