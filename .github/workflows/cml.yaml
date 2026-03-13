@@ -27,7 +27,10 @@ jobs:
       - name: Train model
         run: |
           python src/train.py
-          ls -R # Виведе список усіх файлів, щоб ми бачили, чи з'явилися артефакти
+          echo "Перевірка створених файлів:"
+          ls -F
+          [ -f metrics.json ] && echo "metrics.json існує" || echo "metrics.json ВІДСУТНІЙ"
+          [ -d models ] && ls models/ || echo "папка models ВІДСУТНЯ"
 
       - name: Run Quality Gate Tests
         env:
