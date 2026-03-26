@@ -74,7 +74,6 @@ def check_accuracy(**kwargs):
 branching = BranchPythonOperator(
     task_id='branching',
     python_callable=check_accuracy,
-    provide_context=True,
     dag=dag,
 )
 
@@ -112,7 +111,6 @@ def register_in_mlflow(**kwargs):
 register_model = PythonOperator(
     task_id='register_model',
     python_callable=register_in_mlflow,
-    provide_context=True,
     dag=dag,
 )
 
