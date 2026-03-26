@@ -23,6 +23,14 @@ jobs:
           # Встановлюємо лише необхідне для навчання та тестів
           pip install --only-binary=:all: numpy pandas scikit-learn pytest matplotlib seaborn joblib
           pip install -r requirements.txt
+          # Airflow для тестування DAG-ів
+          pip install "apache-airflow==2.7.1" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.7.1/constraints-3.10.txt"
+          # Лінтер
+          pip install flake8
+
+      - name: Lint code
+        run: |
+          flake8 src tests airflow/dags
 
       - name: Train model
         run: |
@@ -36,7 +44,11 @@ jobs:
         env:
           F1_THRESHOLD: "0.70"
         run: |
-          pytest tests/test_model.py
+          pytest tests
+
+      - name: Docker build (ML pipeline image)
+        run: |
+          docker build -t mlops-lab5 .
 
       - name: Create Report
         if: github.event_name == 'pull_request'

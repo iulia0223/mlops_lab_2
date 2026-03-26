@@ -10,8 +10,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
 from sklearn.impute import SimpleImputer
 
+from omegaconf import DictConfig
+
 @hydra.main(version_base=None, config_path="../config", config_name="config")
 def main(cfg: DictConfig):
+
     # 1. Налаштування MLflow [cite: 147]
     mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
     mlflow.set_experiment(cfg.mlflow.experiment_name)
@@ -74,8 +77,11 @@ def main(cfg: DictConfig):
 
     # 4. Запуск процесу оптимізації (Parent Run) [cite: 63, 144, 386]
     with mlflow.start_run(run_name="HPO_Study_Parent") as parent_run:
-        # Фіксуємо seed для відтворюваності [cite: 6, 59, 184]
-        sampler = optuna.samplers.TPESampler(seed=cfg.seed)
+        # Фіксуємо seed для відтворюваності
+        if cfg.hpo.get("sampler", "tpe").lower() == "random":
+            sampler = optuna.samplers.RandomSampler(seed=cfg.seed)
+        else:
+            sampler = optuna.samplers.TPESampler(seed=cfg.seed)
         
         study = optuna.create_study(direction=cfg.hpo.direction, sampler=sampler)
         study.optimize(objective, n_trials=cfg.hpo.n_trials) # Запуск 20 спроб [cite: 22, 150]

@@ -1,6 +1,6 @@
 seed: 42
 mlflow:
-  tracking_uri: "http://127.0.0.1:5000"
+  tracking_uri: "http://127.0.0.1:5001"
   experiment_name: "Rain_Australia_HPO"
 data:
   processed_path: "data/prepared/train.csv" # перевірте, чи файл за цим шляхом

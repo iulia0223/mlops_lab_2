@@ -1,0 +1,46 @@
+name: MLOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  linting:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    - name: Install flake8
+      run: pip install flake8
+    - name: Run flake8
+      # Checking the src, tests, and dags folders for syntax errors
+      run: flake8 src/ tests/ airflow/dags/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  dag-test:
+    name: DAG Integrity Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    - name: Install Airflow and Dependencies
+      run: |
+        pip install apache-airflow pytest pandas scikit-learn numpy matplotlib seaborn joblib mlflow
+    - name: Test DAG Integrity
+      run: pytest tests/test_dag_integrity.py
+
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Initializing Docker Build
+      run: docker build -t mlops_lab_1_image .

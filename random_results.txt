@@ -1,0 +1,38 @@
+/Users/yuliyatsyuvanyk/Desktop/mlops_lab_1/.venv_mac/lib/python3.14/site-packages/mlflow/tracking/_tracking_service/utils.py:184: FutureWarning: The filesystem tracking backend (e.g., './mlruns') is deprecated as of February 2026. Consider transitioning to a database backend (e.g., 'sqlite:///mlflow.db') to take advantage of the latest MLflow features. See https://mlflow.org/docs/latest/self-hosting/migrate-from-file-store for migration guidance.
+  return FileStore(store_uri, store_uri)
+WARNING:root:Malformed experiment '1'. Detailed error Yaml file '/Users/yuliyatsyuvanyk/Desktop/mlops_lab_1/mlruns/1/meta.yaml' does not exist.
+Traceback (most recent call last):
+  File "/Users/yuliyatsyuvanyk/Desktop/mlops_lab_1/.venv_mac/lib/python3.14/site-packages/mlflow/store/tracking/file_store.py", line 383, in search_experiments
+    exp = self._get_experiment(exp_id, view_type)
+  File "/Users/yuliyatsyuvanyk/Desktop/mlops_lab_1/.venv_mac/lib/python3.14/site-packages/mlflow/store/tracking/file_store.py", line 481, in _get_experiment
+    meta = FileStore._read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+  File "/Users/yuliyatsyuvanyk/Desktop/mlops_lab_1/.venv_mac/lib/python3.14/site-packages/mlflow/store/tracking/file_store.py", line 1670, in _read_yaml
+    return _read_helper(root, file_name, attempts_remaining=retries)
+  File "/Users/yuliyatsyuvanyk/Desktop/mlops_lab_1/.venv_mac/lib/python3.14/site-packages/mlflow/store/tracking/file_store.py", line 1663, in _read_helper
+    result = read_yaml(root, file_name)
+  File "/Users/yuliyatsyuvanyk/Desktop/mlops_lab_1/.venv_mac/lib/python3.14/site-packages/mlflow/utils/yaml_utils.py", line 104, in read_yaml
+    raise MissingConfigException(f"Yaml file '{file_path}' does not exist.")
+mlflow.exceptions.MissingConfigException: Yaml file '/Users/yuliyatsyuvanyk/Desktop/mlops_lab_1/mlruns/1/meta.yaml' does not exist.
+[I 2026-03-26 01:00:46,414] A new study created in memory with name: no-name-e8a4ad69-b682-4a0a-97de-9f875291100e
+[I 2026-03-26 01:00:49,261] Trial 0 finished with value: 0.7992071794307107 and parameters: {'n_estimators': 106, 'max_depth': 15}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:00:52,489] Trial 1 finished with value: 0.6187968600121371 and parameters: {'n_estimators': 160, 'max_depth': 10}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:00:53,202] Trial 2 finished with value: 0.48971596474045054 and parameters: {'n_estimators': 73, 'max_depth': 4}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:00:54,828] Trial 3 finished with value: 0.759459661168744 and parameters: {'n_estimators': 58, 'max_depth': 14}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:00:57,973] Trial 4 finished with value: 0.6504102712617048 and parameters: {'n_estimators': 140, 'max_depth': 11}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:00:59,539] Trial 5 finished with value: 0.7988644688644688 and parameters: {'n_estimators': 53, 'max_depth': 15}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:01,150] Trial 6 finished with value: 0.4909110652622435 and parameters: {'n_estimators': 175, 'max_depth': 4}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:01,921] Trial 7 finished with value: 0.48786550663962847 and parameters: {'n_estimators': 77, 'max_depth': 4}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:03,646] Trial 8 finished with value: 0.5974154088980961 and parameters: {'n_estimators': 95, 'max_depth': 9}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:05,123] Trial 9 finished with value: 0.547993375994112 and parameters: {'n_estimators': 115, 'max_depth': 6}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:06,227] Trial 10 finished with value: 0.45252003803831004 and parameters: {'n_estimators': 142, 'max_depth': 3}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:07,637] Trial 11 finished with value: 0.5609765956586766 and parameters: {'n_estimators': 94, 'max_depth': 7}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:10,425] Trial 12 finished with value: 0.6860318551621405 and parameters: {'n_estimators': 118, 'max_depth': 12}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:11,967] Trial 13 finished with value: 0.5980508207070707 and parameters: {'n_estimators': 80, 'max_depth': 9}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:12,795] Trial 14 finished with value: 0.3543437848556203 and parameters: {'n_estimators': 139, 'max_depth': 2}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:14,118] Trial 15 finished with value: 0.4942016443098226 and parameters: {'n_estimators': 141, 'max_depth': 4}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:15,875] Trial 16 finished with value: 0.798856472657968 and parameters: {'n_estimators': 59, 'max_depth': 15}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:20,801] Trial 17 finished with value: 0.7239398291632021 and parameters: {'n_estimators': 195, 'max_depth': 13}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:21,596] Trial 18 finished with value: 0.4604445640715071 and parameters: {'n_estimators': 95, 'max_depth': 3}. Best is trial 0 with value: 0.7992071794307107.
+[I 2026-03-26 01:01:24,105] Trial 19 finished with value: 0.5767378664055788 and parameters: {'n_estimators': 153, 'max_depth': 8}. Best is trial 0 with value: 0.7992071794307107.
+Optimization finished! Best score: 0.7992071794307107
+Best params: {'n_estimators': 106, 'max_depth': 15}

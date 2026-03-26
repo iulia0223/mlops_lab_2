@@ -36,10 +36,10 @@ def train_final_model():
 
         # 3. Збереження (в КОРІНЬ для тестів)
         preds = model.predict(X)
-        metrics = {"f1": float(f1_score(y, preds)), "accuracy": float(accuracy_score(y, preds))}
-        
-        with open("metrics.json", "w") as f:
-            json.dump(metrics, f, indent=4)
+        # Збереження метрик як вимагається у вказівках
+        metrics = {"accuracy": float(accuracy_score(y, preds)), "f1": float(f1_score(y, preds))}
+        with open("metrics.json", "w", encoding="utf-8") as f:
+            json.dump(metrics, f, ensure_ascii=False, indent=2)
         
         cm = confusion_matrix(y, preds)
         plt.figure(figsize=(8, 6))
