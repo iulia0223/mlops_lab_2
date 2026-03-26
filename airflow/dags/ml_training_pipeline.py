@@ -19,7 +19,7 @@ dag = DAG(
     'ml_training_pipeline',
     default_args=default_args,
     description='ML Training Pipeline with DVC and MLflow',
-    schedule_interval='@daily',
+    schedule='@daily',
     catchup=False,
 )
 

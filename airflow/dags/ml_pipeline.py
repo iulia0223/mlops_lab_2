@@ -78,7 +78,7 @@ with DAG(
     "ml_training_pipeline_v1",
     default_args=default_args,
     description="Пайплайн для автоматизації Continuous Training (CT)",
-    schedule_interval=None,
+    schedule=None,
     catchup=False,
     tags=["mlops", "lab5"],
 ) as dag:
