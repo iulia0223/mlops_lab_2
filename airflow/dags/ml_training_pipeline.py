@@ -48,6 +48,8 @@ train_model = BashOperator(
 )
 
 # Функція для Task 4a: Зчитування метрик
+
+
 def push_metrics_to_xcom(**kwargs):
     metrics_path = '/opt/airflow/project/metrics.json'
     if not os.path.exists(metrics_path):
@@ -57,6 +59,7 @@ def push_metrics_to_xcom(**kwargs):
     print(f"Зчитані метрики: {metrics}")
     return metrics
 
+
 evaluate_model = PythonOperator(
     task_id='evaluate_model',
     python_callable=push_metrics_to_xcom,
@@ -64,12 +67,15 @@ evaluate_model = PythonOperator(
 )
 
 # Функція для Task 4b: Branching (за методичними вказівками)
+
+
 def check_accuracy(**kwargs):
     ti = kwargs['ti']
     metrics = ti.xcom_pull(task_ids='evaluate_model')
     if metrics and metrics.get('accuracy', 0) > 0.85:
         return 'register_model'
     return 'stop_pipeline'
+
 
 branching = BranchPythonOperator(
     task_id='branching',
@@ -78,28 +84,30 @@ branching = BranchPythonOperator(
 )
 
 # 5. Model Registration
+
+
 def register_in_mlflow(**kwargs):
     print("Реєстрація моделі в MLflow Staging...")
     mlflow.set_tracking_uri("file:///opt/airflow/project/mlruns")
     mlflow.set_experiment("Production_Models")
-    
+
     import joblib
     # Завантажуємо навчену збережену модель
     model = joblib.load('/opt/airflow/project/models/model.pkl')
-    
+
     with mlflow.start_run() as run:
         # Логуємо артефакти як звичайні файли
         mlflow.log_artifact('/opt/airflow/project/metrics.json')
         mlflow.log_artifact('/opt/airflow/project/confusion_matrix.png')
-        
+
         # Логуємо модель саме як MLflow Model (щоб реєстр працював)
         mlflow.sklearn.log_model(model, "rain_model")
-        
+
         run_id = run.info.run_id
         model_uri = f"runs:/{run_id}/rain_model"
-        
+
         result = mlflow.register_model(model_uri, "RandomForest_Weather")
-        
+
         client = mlflow.tracking.MlflowClient()
         client.transition_model_version_stage(
             name="RandomForest_Weather",
@@ -107,6 +115,7 @@ def register_in_mlflow(**kwargs):
             stage="Staging"
         )
     print("Модель успішно зареєстрована у Staging.")
+
 
 register_model = PythonOperator(
     task_id='register_model',
@@ -116,7 +125,10 @@ register_model = PythonOperator(
 
 stop_pipeline = BashOperator(
     task_id='stop_pipeline',
-    bash_command='echo "Якість моделі низька (Accuracy <= 0.85). Пайплайн завершено без реєстрації."',
+    bash_command=(
+        'echo "Якість моделі низька (Accuracy <= 0.85). '
+        'Пайплайн завершено без реєстрації."'
+    ),
     dag=dag,
 )
 

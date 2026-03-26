@@ -26,7 +26,8 @@ def evaluate_model(**_kwargs):
     """Зчитує metrics.json та повертає метрики в XCom."""
     metrics_path = "/opt/airflow/metrics.json"
     if not os.path.exists(metrics_path):
-        raise FileNotFoundError(f"metrics.json не знайдено за шляхом {metrics_path}")
+        raise FileNotFoundError(
+            f"metrics.json не знайдено за шляхом {metrics_path}")
 
     with open(metrics_path, "r", encoding="utf-8") as f:
         metrics = json.load(f)
@@ -53,7 +54,8 @@ def register_model(**_kwargs):
 
     tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
     experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "Rain_Australia_CT")
-    registered_model_name = os.getenv("MLFLOW_REGISTERED_MODEL_NAME", "rain_australia_model")
+    registered_model_name = os.getenv(
+        "MLFLOW_REGISTERED_MODEL_NAME", "rain_australia_model")
 
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment(experiment_name)
@@ -63,7 +65,8 @@ def register_model(**_kwargs):
     with mlflow.start_run(run_name="ct_register_from_airflow") as run:
         mlflow.sklearn.log_model(model, artifact_path="model")
         model_uri = f"runs:/{run.info.run_id}/model"
-        result = mlflow.register_model(model_uri=model_uri, name=registered_model_name)
+        result = mlflow.register_model(
+            model_uri=model_uri, name=registered_model_name)
 
     client = mlflow.tracking.MlflowClient()
     client.transition_model_version_stage(
